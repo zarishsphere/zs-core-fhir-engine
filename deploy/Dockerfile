@@ -1,9 +1,9 @@
 # ZarishSphere FHIR R5 Engine — Multi-stage Docker build
 # Produces a minimal final image that runs on Raspberry Pi 5 (ARM64)
-# ADR-0001: Go 1.26.1 single binary, offline-capable
+# ADR-0001: Go 1.21.13 single binary, offline-capable
 
 # ── Stage 1: Build ────────────────────────────────────────────────────────
-FROM golang:1.26.1-alpine3.22 AS builder
+FROM golang:1.21-alpine AS builder
 
 # Install CA certs and git for go get
 RUN apk add --no-cache ca-certificates git tzdata
@@ -27,6 +27,35 @@ RUN CGO_ENABLED=0 GOOS=linux go build \
       -X 'main.BuildTime=${BUILD_TIME}'" \
     -o /build/zs-fhir-engine \
     ./cmd/server
+
+# ── Stage 2: Runtime ──────────────────────────────────────────────────────
+FROM alpine:3.19
+
+# Install CA certs for HTTPS requests
+RUN apk --no-cache add ca-certificates tzdata
+
+# Create non-root user
+RUN addgroup -S appgroup && adduser -S appuser -G appgroup
+
+WORKDIR /app
+
+# Copy binary and certificates from builder
+COPY --from=builder /build/zs-fhir-engine .
+COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
+
+# Change ownership and switch to non-root user
+RUN chown -R appuser:appgroup /app
+USER appuser
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+  CMD wget --quiet --tries=1 --spider http://localhost:8080/health || exit 1
+
+# Expose port
+EXPOSE 8080
+
+# Run the binary
+ENTRYPOINT ["/app/zs-fhir-engine"]
 
 # ── Stage 2: Final minimal image ──────────────────────────────────────────
 # Use distroless for minimal attack surface
