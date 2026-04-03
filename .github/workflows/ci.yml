@@ -1,6 +1,6 @@
-name: CI/CD — zs-core-fhir-engine
+name: CI/CD - zs-core-fhir-engine
 
-on:
+"on":
   push:
     branches: [main]
   pull_request:
