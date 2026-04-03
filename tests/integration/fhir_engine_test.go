@@ -16,6 +16,7 @@ import (
 	"time"
 
 	"github.com/docker/go-connections/nat"
+	"github.com/golang-jwt/jwt/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -97,6 +98,21 @@ func setupTest(t *testing.T) *testSetup {
 	}
 }
 
+func testJWT(t *testing.T, tenantID string) string {
+	t.Helper()
+	claims := jwt.MapClaims{
+		"iss":       "http://localhost",
+		"sub":       "integration-test-user",
+		"tenant_id": tenantID,
+		"scope":     "patient/Patient.read patient/Patient.write",
+		"exp":       time.Now().Add(5 * time.Minute).Unix(),
+	}
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	signed, err := token.SignedString([]byte("test_secret"))
+	require.NoError(t, err)
+	return signed
+}
+
 // --------------------------------------------------------------------------
 // Tests
 // --------------------------------------------------------------------------
@@ -155,17 +171,13 @@ func TestPatientCreateReadDeleteCycle(t *testing.T) {
 		http.MethodPost, setup.server.URL+"/fhir/R5/Patient",
 		bytes.NewReader(body))
 	createReq.Header.Set("Content-Type", "application/fhir+json")
-	// In real usage: Authorization: Bearer <SMART token>
-	// For test: skip auth via test mode
+	createReq.Header.Set("Authorization", "Bearer "+testJWT(t, tenantID))
 
 	createResp, err := http.DefaultClient.Do(createReq)
 	require.NoError(t, err)
 	defer createResp.Body.Close()
 
-	// Note: Without valid JWT, auth middleware returns 401.
-	// Integration tests should inject a test JWT or bypass auth.
-	// For now, verify the endpoint structure responds correctly.
-	assert.Contains(t, []int{http.StatusCreated, http.StatusUnauthorized}, createResp.StatusCode)
+	assert.Equal(t, http.StatusCreated, createResp.StatusCode)
 
 	// Verify Content-Type is always FHIR
 	assert.Contains(t, createResp.Header.Get("Content-Type"), "fhir+json")
@@ -175,18 +187,20 @@ func TestSearchReturnsBundle(t *testing.T) {
 	setup := setupTest(t)
 	defer setup.cancel()
 
-	resp, err := http.Get(setup.server.URL + "/fhir/R5/Patient")
+	req, err := http.NewRequestWithContext(setup.ctx, http.MethodGet, setup.server.URL+"/fhir/R5/Patient", nil)
+	require.NoError(t, err)
+	req.Header.Set("Authorization", "Bearer "+testJWT(t, "cpi:bgd-health:camp-1w-test"))
+
+	resp, err := http.DefaultClient.Do(req)
 	require.NoError(t, err)
 	defer resp.Body.Close()
 
-	assert.Contains(t, []int{http.StatusOK, http.StatusUnauthorized}, resp.StatusCode)
+	assert.Equal(t, http.StatusOK, resp.StatusCode)
 
-	if resp.StatusCode == http.StatusOK {
-		var bundle map[string]any
-		require.NoError(t, json.NewDecoder(resp.Body).Decode(&bundle))
-		assert.Equal(t, "Bundle", bundle["resourceType"])
-		assert.Equal(t, "searchset", bundle["type"])
-	}
+	var bundle map[string]any
+	require.NoError(t, json.NewDecoder(resp.Body).Decode(&bundle))
+	assert.Equal(t, "Bundle", bundle["resourceType"])
+	assert.Equal(t, "searchset", bundle["type"])
 }
 
 func TestOperationOutcomeOnBadJSON(t *testing.T) {

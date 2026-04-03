@@ -8,10 +8,8 @@ import (
 
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/rs/zerolog/log"
+	"github.com/zarishsphere/zs-core-fhir-engine/internal/api/contextkeys"
 )
-
-// tenantContextKey is the context key for tenant_id.
-type tenantContextKey struct{}
 
 // principalContextKey is the context key for the authenticated principal.
 type principalContextKey struct{}
@@ -91,7 +89,7 @@ func SMARTAuth(oidcIssuer, clientID, jwtSecret string) func(http.Handler) http.H
 			}
 
 			// Inject tenant_id and claims into context
-			ctx := context.WithValue(r.Context(), tenantContextKey{}, claims.TenantID)
+			ctx := contextkeys.WithTenantID(r.Context(), claims.TenantID)
 			ctx = context.WithValue(ctx, principalContextKey{}, claims)
 
 			// Log authenticated access (structured, for zerolog)
