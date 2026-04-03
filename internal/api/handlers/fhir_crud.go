@@ -22,12 +22,10 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/rs/zerolog/log"
+	"github.com/zarishsphere/zs-core-fhir-engine/internal/api/contextkeys"
 	zsfhir "github.com/zarishsphere/zs-pkg-go-fhir/pkg/fhir"
 	"github.com/zarishsphere/zs-pkg-go-fhir/pkg/audit"
 )
-
-// tenantContextKey is the context key for tenant_id (set by middleware).
-type tenantContextKey struct{}
 
 // FHIR content type header value.
 const fhirContentType = "application/fhir+json; charset=utf-8"
@@ -555,7 +553,7 @@ func (h *FHIRHandlers) searchResources(ctx context.Context, resourceType, tenant
 }
 
 func tenantFromCtx(ctx context.Context) string {
-	if v, ok := ctx.Value(tenantContextKey{}).(string); ok {
+	if v, ok := contextkeys.TenantIDFromContext(ctx); ok {
 		return v
 	}
 	return "default"

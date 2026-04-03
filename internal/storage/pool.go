@@ -5,7 +5,7 @@
 //   - pgx v5.7.x: pure Go driver, async I/O, connection pooling
 //   - Row-Level Security enforced at DB layer for tenant isolation
 //   - All queries use parameterized statements (no string concatenation)
-//   - Every connection sets app.tenant_id for RLS enforcement
+//   - Tenant scoping is set per transaction/query path (not globally per connection)
 //   - TimescaleDB 2.25 for observation time-series
 package storage
 
@@ -85,8 +85,8 @@ func NewPool(cfg DBConfig) (*pgxpool.Pool, error) {
 		return nil, fmt.Errorf("storage: parse pool config: %w", err)
 	}
 
-	// AfterConnect hook — sets the role and default search path.
-	// The tenant_id is set per-query via SET LOCAL, not here.
+	// AfterConnect hook intentionally does not set tenant_id globally.
+	// Tenant scope is set in transaction/query execution paths.
 	poolCfg.AfterConnect = func(ctx context.Context, conn *pgx.Conn) error {
 		_ = ctx
 		_ = conn
