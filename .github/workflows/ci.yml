@@ -66,8 +66,6 @@ jobs:
 
       - name: CodeQL SAST
         uses: github/codeql-action/analyze@v3
-        with:
-          languages: go
 
       - name: gitleaks secrets history scan
         uses: gitleaks/gitleaks-action@v2
