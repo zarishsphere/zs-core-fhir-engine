@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "zs-core-fhir-engine.fullname" . }}-config
+  labels:
+    {{- include "zs-core-fhir-engine.labels" . | nindent 4 }}
+data:
+  config.yaml: |
+    env: {{ .Values.config.env }}
+    service_name: zs-core-fhir-engine
+    server:
+      port: {{ .Values.config.server.port }}
+      read_timeout: {{ .Values.config.server.readTimeout }}
+      write_timeout: {{ .Values.config.server.writeTimeout }}
+    fhir:
+      base_path: {{ .Values.config.fhir.basePath }}
+      max_request_body_bytes: {{ .Values.config.fhir.maxRequestBodyBytes }}
+      default_page_size: {{ .Values.config.fhir.defaultPageSize }}
+      max_page_size: {{ .Values.config.fhir.maxPageSize }}
+      validate_on_create: {{ .Values.config.fhir.validateOnCreate }}
+      audit_all_reads: {{ .Values.config.fhir.auditAllReads }}

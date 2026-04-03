@@ -1,0 +1,20 @@
+apiVersion: v2
+name: zs-core-fhir-engine
+description: ZarishSphere FHIR R5 Engine — Helm 3.17+ chart
+type: application
+version: 1.0.0
+appVersion: "1.0.0"
+keywords:
+  - fhir
+  - r5
+  - healthcare
+  - zarishsphere
+home: https://zarishsphere.com
+sources:
+  - https://github.com/zarishsphere/zs-core-fhir-engine
+maintainers:
+  - name: ZarishSphere DevOps
+    email: platform@zarishsphere.com
+annotations:
+  category: Healthcare
+  license: Apache-2.0

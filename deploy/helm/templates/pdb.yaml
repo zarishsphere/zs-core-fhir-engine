@@ -1,0 +1,13 @@
+{{- if .Values.podDisruptionBudget.enabled }}
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: {{ include "zs-core-fhir-engine.fullname" . }}
+  labels:
+    {{- include "zs-core-fhir-engine.labels" . | nindent 4 }}
+spec:
+  minAvailable: {{ .Values.podDisruptionBudget.minAvailable }}
+  selector:
+    matchLabels:
+      {{- include "zs-core-fhir-engine.selectorLabels" . | nindent 6 }}
+{{- end }}

@@ -1,0 +1,182 @@
+# ZarishSphere FHIR R5 Engine — Helm Values
+# Override per environment: helm install ... -f values-bgd.yaml
+
+replicaCount: 2
+
+image:
+  repository: ghcr.io/zarishsphere/zs-core-fhir-engine
+  pullPolicy: IfNotPresent
+  tag: ""  # Overridden by CI/CD with git SHA or semver tag
+
+imagePullSecrets: []
+
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  create: true
+  annotations: {}
+  name: ""
+
+# FHIR engine configuration
+config:
+  env: production
+  fhir:
+    basePath: /fhir/R5
+    maxRequestBodyBytes: 10485760
+    defaultPageSize: 20
+    maxPageSize: 100
+    validateOnCreate: true
+    auditAllReads: true
+  server:
+    port: 8080
+    readTimeout: 30s
+    writeTimeout: 60s
+
+# Database connection (secrets via Kubernetes Secret, not here)
+database:
+  host: postgresql.zs-data.svc.cluster.local
+  port: 5432
+  name: zarishsphere
+  user: zs_fhir_app
+  # password: injected via Vault Agent / Kubernetes Secret
+  sslMode: require
+  maxConns: 25
+  minConns: 5
+  existingSecret: ""       # Name of K8s Secret with DB_PASSWORD key
+  existingSecretKey: ""
+
+# Auth — Keycloak 26.5.6
+auth:
+  oidcIssuer: "https://auth.zarishsphere.com/realms/zarishsphere"
+  clientId: "zs-fhir-engine"
+  jwksEndpoint: "https://auth.zarishsphere.com/realms/zarishsphere/protocol/openid-connect/certs"
+
+# NATS 2.12.5 messaging
+nats:
+  url: "nats://nats.zs-data.svc.cluster.local:4222"
+  clusterId: zarishsphere
+  clientId: zs-fhir-engine
+
+# Kubernetes Service
+service:
+  type: ClusterIP
+  port: 8080
+  metricsPort: 9090
+
+# Ingress — Traefik 3.x
+ingress:
+  enabled: true
+  className: traefik
+  annotations:
+    traefik.ingress.kubernetes.io/router.tls: "true"
+    traefik.ingress.kubernetes.io/router.entrypoints: websecure
+  hosts:
+    - host: fhir.zarishsphere.com
+      paths:
+        - path: /fhir/R5
+          pathType: Prefix
+        - path: /healthz
+          pathType: Exact
+  tls:
+    - secretName: fhir-tls-secret
+      hosts:
+        - fhir.zarishsphere.com
+
+# Resource limits — tested on Raspberry Pi 5 (4GB RAM)
+resources:
+  requests:
+    cpu: "100m"
+    memory: "128Mi"
+  limits:
+    cpu: "500m"
+    memory: "512Mi"
+
+# Horizontal Pod Autoscaler
+autoscaling:
+  enabled: true
+  minReplicas: 2
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 70
+  targetMemoryUtilizationPercentage: 80
+
+# Pod Disruption Budget (zero-downtime deploys)
+podDisruptionBudget:
+  enabled: true
+  minAvailable: 1
+
+# Liveness / readiness probes
+livenessProbe:
+  httpGet:
+    path: /healthz
+    port: 8080
+  initialDelaySeconds: 15
+  periodSeconds: 20
+  failureThreshold: 3
+
+readinessProbe:
+  httpGet:
+    path: /readyz
+    port: 8080
+  initialDelaySeconds: 10
+  periodSeconds: 10
+  failureThreshold: 3
+
+# Security context — run as non-root
+podSecurityContext:
+  runAsNonRoot: true
+  runAsUser: 65532
+  runAsGroup: 65532
+  fsGroup: 65532
+  seccompProfile:
+    type: RuntimeDefault
+
+containerSecurityContext:
+  allowPrivilegeEscalation: false
+  readOnlyRootFilesystem: true
+  runAsNonRoot: true
+  runAsUser: 65532
+  capabilities:
+    drop:
+      - ALL
+
+# Environment variables (non-secret)
+env: []
+
+# Secrets to inject as environment variables
+# Reference existing K8s secrets created by Vault Agent
+envFrom: []
+
+# Persistent volume for migration state
+# Migrations use init container; no PV needed for stateless binary
+
+# Pod annotations for Prometheus scraping
+podAnnotations:
+  prometheus.io/scrape: "true"
+  prometheus.io/path: "/metrics"
+  prometheus.io/port: "9090"
+
+# Tolerations for Raspberry Pi / edge nodes
+tolerations: []
+
+nodeSelector: {}
+
+affinity:
+  podAntiAffinity:
+    preferredDuringSchedulingIgnoredDuringExecution:
+      - weight: 100
+        podAffinityTerm:
+          labelSelector:
+            matchExpressions:
+              - key: app.kubernetes.io/name
+                operator: In
+                values:
+                  - zs-core-fhir-engine
+          topologyKey: kubernetes.io/hostname
+
+# Init container runs golang-migrate before main container starts
+initContainers:
+  migrate:
+    enabled: true
+    image: ghcr.io/zarishsphere/zs-core-fhir-engine
+    command: ["/app/zs-fhir-engine", "migrate"]
