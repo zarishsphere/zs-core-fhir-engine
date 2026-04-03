@@ -1,0 +1,282 @@
+{
+  "generated_by": "tools/external_inventory.py",
+  "workspace_root": "/home/ariful/Desktop/zarishsphere/_cloned",
+  "summary": {
+    "source_count": 6,
+    "highest_priority_sources": [
+      "bd-core-fhir-ig",
+      "bangladesh-config",
+      "lime-emr"
+    ]
+  },
+  "sources": [
+    {
+      "id": "bd-core-fhir-ig",
+      "name": "Bangladesh Core FHIR IG",
+      "path": "/home/ariful/Desktop/zarishsphere/_cloned/BD-Core-FHIR-IG-main",
+      "source_type": "national_fhir_ig",
+      "priority": "highest",
+      "license": "LICENSE",
+      "counts": {
+        "yaml": 3,
+        "xml": 8,
+        "fsh": 41
+      },
+      "target_repos": [
+        "zs-data-fhir-profiles",
+        "zs-country-bgd-fhir-ig",
+        "zs-country-bgd-terminology"
+      ],
+      "intended_use": "National profiles, value sets, code systems, naming systems, and narrative governance for Bangladesh.",
+      "migration_rule": "Extract FSH, terminology, and profile definitions. Do not keep the full IG publisher cache/template in product repos.",
+      "samples": {
+        "fsh_samples": [
+          "input/fsh/valueSets/BDImmunizationSiteVs.fsh",
+          "input/fsh/valueSets/BDConditionICD11DiagnosisVS.fsh",
+          "input/fsh/valueSets/BDImmunizationRouteVS.fsh",
+          "input/fsh/valueSets/BDEncounterStatusSubsetVS.fsh",
+          "input/fsh/valueSets/BDVaccineVS.fsh",
+          "input/fsh/valueSets/BDLanguage.fsh",
+          "input/fsh/valueSets/BDEncounterClassSubsetVS.fsh",
+          "input/fsh/valueSets/BDImmunizationReactionVS.fsh",
+          "input/fsh/extensions/division.fsh",
+          "input/fsh/extensions/upazilla.fsh",
+          "input/fsh/extensions/religion.fsh",
+          "input/fsh/extensions/icd11ClusterExpression.fsh"
+        ],
+        "form_samples": [],
+        "concept_samples": [],
+        "sql_samples": []
+      }
+    },
+    {
+      "id": "bangladesh-config",
+      "name": "Bangladesh Bahmni/OpenMRS Config",
+      "path": "/home/ariful/Desktop/zarishsphere/_cloned/bangladesh-config",
+      "source_type": "country_openmrs_bahmni_config",
+      "priority": "highest",
+      "license": "LICENSE",
+      "counts": {
+        "json_forms": 113,
+        "yaml": 24,
+        "sql": 58,
+        "csv_concepts": 66,
+        "xml": 2,
+        "json_translations": 57
+      },
+      "target_repos": [
+        "zs-country-bgd-openmrs-config",
+        "zs-content-forms-bgd",
+        "zs-content-terminology-bgd",
+        "zs-analytics-sql-bgd"
+      ],
+      "intended_use": "Bangladesh-specific clinical forms, translations, concepts, SQL marts, and operational config.",
+      "migration_rule": "Split forms, translations, concepts, analytics SQL, and deployment config into separate content packages. Avoid keeping database dumps in the main content repos.",
+      "samples": {
+        "fsh_samples": [],
+        "form_samples": [
+          "clinical_forms/9b01edd2-24b0-471f-9a30-33bdbdab7a88.json",
+          "clinical_forms/e6daee0b-df28-4f04-a832-6175cbc99798.json",
+          "clinical_forms/ce814ce2-769c-4a9b-92f8-87b282bb9e03.json",
+          "clinical_forms/5ac1885a-e1cc-4bfc-a9e8-87a24d1721a8.json",
+          "clinical_forms/7d493e7e-55ca-4c35-8efa-b2d46754c9b4.json",
+          "clinical_forms/49fd533d-cfb2-470c-8e73-49c532a0f7dd.json",
+          "clinical_forms/98e6576a-9886-49f9-9712-f5813497f4da.json",
+          "clinical_forms/f41b9715-c383-49bc-a0f2-a18ba934a59a.json",
+          "clinical_forms/0d185f2f-5ebd-4467-9ed1-e74b1331c5fa.json",
+          "clinical_forms/e8aee172-7547-465b-92ba-23344716c081.json",
+          "clinical_forms/1aa867f3-da1c-4c79-ae86-c9b326a54c5e.json",
+          "clinical_forms/0ddb7753-63fc-49a7-b367-5a9e1879c203.json"
+        ],
+        "concept_samples": [
+          "openmrs/templates/Epilepsy_concepts.csv",
+          "openmrs/templates/Sickle_cell_concept_sets.csv",
+          "openmrs/templates/Neurological_disorder_concept_sets.csv",
+          "openmrs/templates/Epilepsy_concept_sets.csv",
+          "openmrs/templates/Kaposis_sarcoma_concepts.csv",
+          "openmrs/templates/Generic_concepts.csv",
+          "openmrs/templates/Detailed_history_concept_sets.csv",
+          "openmrs/templates/Gastric_generic_concepts.csv",
+          "openmrs/templates/COPD_intake_concepts.csv",
+          "openmrs/templates/Gastric_cancer_concept_sets.csv",
+          "openmrs/templates/Breast_cancer_concepts.csv",
+          "openmrs/templates/Colon_cancer_concepts.csv"
+        ],
+        "sql_samples": [
+          "bahmni-mart/metabase-config.sql",
+          "bahmni-mart/cohort_count.sql",
+          "database-snapshots/user_roles.sql",
+          "database-snapshots/db-initializer.sql",
+          "database-snapshots/patient-data-cleanup.sql",
+          "database-snapshots/latest-openmrs_backup.sql",
+          "database-snapshots/anonymization-script.sql",
+          "database-snapshots/latest-backup.sql",
+          "database-snapshots/metabase.sql",
+          "openmrs/migrations/updatePatientProgramToEpisode.sql",
+          "openmrs/apps/reports/sql/testCount.sql",
+          "bahmni-mart/viewSql/last_comorbidities_per_patient_id_view.sql"
+        ]
+      }
+    },
+    {
+      "id": "lime-emr",
+      "name": "LIME-EMR",
+      "path": "/home/ariful/Desktop/zarishsphere/_cloned/LIME-EMR",
+      "source_type": "openmrs3_humanitarian_distro",
+      "priority": "highest",
+      "license": "LICENSE",
+      "counts": {
+        "yaml": 20,
+        "xml": 38,
+        "sql": 1,
+        "json_translations": 153,
+        "json_forms": 230,
+        "csv_concepts": 6
+      },
+      "target_repos": [
+        "zs-distro-openmrs3-humanitarian",
+        "zs-content-forms-core",
+        "zs-content-terminology-core",
+        "zs-country-site-templates"
+      ],
+      "intended_use": "Modern distro pattern, reusable humanitarian forms, translations, and site-level initializer structure.",
+      "migration_rule": "Use as the structural reference for packaging and inheritance. Extract reusable form content and site pattern, not MSF branding or unrelated deployment baggage.",
+      "samples": {
+        "fsh_samples": [],
+        "form_samples": [
+          "distro/configs/openmrs/initializer_config/ampathformstranslations/F39-Maternity_discharge_form_translations_en.json",
+          "distro/configs/openmrs/initializer_config/ampathformstranslations/F03-mhGAP_Baseline_translations_en.json",
+          "distro/configs/openmrs/initializer_config/ampathformstranslations/F10-Feeding_form_translations_en.json",
+          "distro/configs/openmrs/initializer_config/ampathformstranslations/F46-Small_procedure_report_form_translations_fr.json",
+          "distro/configs/openmrs/initializer_config/ampathformstranslations/F49-NCDs_Baseline_translations_en.json",
+          "distro/configs/openmrs/initializer_config/ampathformstranslations/F40-Referral_and_Discharge_translations_en.json",
+          "distro/configs/openmrs/initializer_config/ampathformstranslations/F19-Pre_anesthesia_record_translations_fr.json",
+          "distro/configs/openmrs/initializer_config/ampathformstranslations/F33-MHPSS_Closure_v2_translations_en.json",
+          "distro/configs/openmrs/initializer_config/ampathformstranslations/F68-NTDs_Dengue_translations_en.json",
+          "distro/configs/openmrs/initializer_config/ampathformstranslations/F40-Referral_and_Discharge_translations_fr.json",
+          "distro/configs/openmrs/initializer_config/ampathformstranslations/F38-Maternity_delivery_form_translations_ar.json",
+          "distro/configs/openmrs/initializer_config/ampathformstranslations/F64-ICU_Admission_translations_en.json"
+        ],
+        "concept_samples": [
+          "distro/configs/openmrs/initializer_config/conceptsources/msf_default_conceptsources-core.csv",
+          "distro/configs/openmrs/initializer_config/concepts/default_disable_false-core.csv",
+          "distro/configs/openmrs/initializer_config/concepts/msf_default_findings.csv",
+          "distro/configs/openmrs/initializer_config/concepts/default_enable_false-core.csv",
+          "distro/configs/openmrs/initializer_config/concepts/msf_default_misc-core.csv",
+          "distro/configs/openmrs/initializer_config/concepts/msf_default_questions.csv"
+        ],
+        "sql_samples": [
+          "sites/mosul/configs/openmrs/initializer_config/liquibase/sql/serialized_object.sql"
+        ]
+      }
+    },
+    {
+      "id": "kenyahmis",
+      "name": "KenyaHMIS",
+      "path": "/home/ariful/Desktop/zarishsphere/_cloned/kenyahmis",
+      "source_type": "country_openmrs3_distro",
+      "priority": "high",
+      "license": "LICENSE",
+      "counts": {
+        "xml": 4,
+        "yaml": 3,
+        "json_forms": 81,
+        "sql": 6
+      },
+      "target_repos": [
+        "zs-country-ken-openmrs-config",
+        "zs-content-forms-ken",
+        "zs-content-program-hiv"
+      ],
+      "intended_use": "Country-specific HIV, TB, maternal, and service-delivery forms plus Ozone/OpenMRS initializer config.",
+      "migration_rule": "Extract clinical forms and country config patterns. Treat SQL concept dumps as import sources, not canonical truth.",
+      "samples": {
+        "fsh_samples": [],
+        "form_samples": [
+          "configs/openmrs/initializer_config/ampathforms/HTS_Linkage.json",
+          "configs/openmrs/initializer_config/ampathforms/Lab_Result.json",
+          "configs/openmrs/initializer_config/ampathforms/PrEP_Client_Discontinuation.json",
+          "configs/openmrs/initializer_config/ampathforms/OTZ_Enrollment.json",
+          "configs/openmrs/initializer_config/ampathforms/HIV_Green_Card.json",
+          "configs/openmrs/initializer_config/ampathforms/Alcohol_and_Drug_Abuse_Screening(CAGE-AID_CRAFFT).json",
+          "configs/openmrs/initializer_config/ampathforms/Clinic_visit.json",
+          "configs/openmrs/initializer_config/ampathforms/MCH-MS_Discontinuation.json",
+          "configs/openmrs/initializer_config/ampathforms/MCH-MS_Enrollment.json",
+          "configs/openmrs/initializer_config/ampathforms/Covid19_Assessment.json",
+          "configs/openmrs/initializer_config/ampathforms/TPT_FollowUp.json",
+          "configs/openmrs/initializer_config/ampathforms/Clinical_Encounter.json"
+        ],
+        "concept_samples": [],
+        "sql_samples": [
+          "data/mysql/zz_06_add_ciel_version_gp.sql",
+          "data/mysql/zz_04_update_tablet_units.sql",
+          "data/mysql/zz_03_drug_2023-10-25.sql",
+          "data/mysql/zz_02_truncate_drugs.sql",
+          "data/mysql/zz_01_kenyaemr_facility_wide_updated_concepts_dump_2024_02_06.sql",
+          "data/mysql/zz_05_skip_liquibase_schema_scripts.sql"
+        ]
+      }
+    },
+    {
+      "id": "bht-emr-api",
+      "name": "BHT-EMR-API",
+      "path": "/home/ariful/Desktop/zarishsphere/_cloned/BHT-EMR-API",
+      "source_type": "legacy_emr_backend",
+      "priority": "medium",
+      "license": "not_found",
+      "counts": {
+        "sql": 90,
+        "yaml": 52
+      },
+      "target_repos": [
+        "zs-migration-bht",
+        "zs-content-program-hiv",
+        "zs-content-reporting-maps"
+      ],
+      "intended_use": "Legacy program mappings, default concept/program metadata, reporting SQL, and interoperability mappings.",
+      "migration_rule": "Mine domain knowledge and mappings only. Do not adopt the full legacy backend stack into ZarishSphere.",
+      "samples": {
+        "fsh_samples": [],
+        "form_samples": [],
+        "concept_samples": [],
+        "sql_samples": [
+          "bin/anc_migrating_remaining_patients.sql",
+          "bin/migrating_anc_last_patients.sql",
+          "bin/anc_the_last_patients.sql",
+          "bin/anc_patients_only_patient_merge_script.sql",
+          "bin/anc_migrating_patients_with_voided_ART_identifier.sql",
+          "bin/ANC_remaining_patients.sql",
+          "bin/OPD_scripts/first_script.sql",
+          "bin/OPD_scripts/second_script.sql",
+          "bin/OPD_scripts/opd_remaining_patients.sql",
+          "bin/OPD_scripts/opd_patients_with_multiple_identifiers.sql",
+          "bin/OPD_scripts/opd_patient_details_also_in_art.sql",
+          "bin/OPD_scripts/opd_patients_only_patient_merge_script.sql"
+        ]
+      }
+    },
+    {
+      "id": "old-zarishsphere",
+      "name": "Old ZarishSphere",
+      "path": "/home/ariful/Desktop/zarishsphere/_cloned/_old_zarishsphere",
+      "source_type": "legacy_strategy_docs",
+      "priority": "medium",
+      "license": "not_found",
+      "counts": {
+        "yaml": 33
+      },
+      "target_repos": [
+        "zs-docs-platform",
+        "zs-docs-standards"
+      ],
+      "intended_use": "Legacy platform narrative, value proposition, and positioning language.",
+      "migration_rule": "Reuse only validated product language and diagrams after aligning to the current repo reality.",
+      "samples": {
+        "fsh_samples": [],
+        "form_samples": [],
+        "concept_samples": [],
+        "sql_samples": []
+      }
+    }
+  ]
+}
