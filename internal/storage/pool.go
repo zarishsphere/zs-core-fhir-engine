@@ -14,6 +14,8 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/rs/zerolog/log"
 )
@@ -21,17 +23,17 @@ import (
 // DBConfig holds PostgreSQL connection configuration.
 // Values are loaded from Viper config or environment variables.
 type DBConfig struct {
-	Host         string
-	Port         int
-	Database     string
-	User         string
-	Password     string
-	SSLMode      string
-	MaxConns     int32
-	MinConns     int32
-	MaxConnLife  time.Duration
-	MaxConnIdle  time.Duration
-	HealthCheck  time.Duration
+	Host        string
+	Port        int
+	Database    string
+	User        string
+	Password    string
+	SSLMode     string
+	MaxConns    int32
+	MinConns    int32
+	MaxConnLife time.Duration
+	MaxConnIdle time.Duration
+	HealthCheck time.Duration
 }
 
 // DSN returns the PostgreSQL DSN string for golang-migrate.
@@ -85,9 +87,9 @@ func NewPool(cfg DBConfig) (*pgxpool.Pool, error) {
 
 	// AfterConnect hook — sets the role and default search path.
 	// The tenant_id is set per-query via SET LOCAL, not here.
-	poolCfg.AfterConnect = func(ctx context.Context, conn interface {
-		Exec(ctx context.Context, sql string, args ...any) (interface{}, error)
-	}) error {
+	poolCfg.AfterConnect = func(ctx context.Context, conn *pgx.Conn) error {
+		_ = ctx
+		_ = conn
 		// No-op in pool setup — tenant isolation via query params
 		return nil
 	}
@@ -157,9 +159,9 @@ func WithTenantTx(ctx context.Context, pool *pgxpool.Pool, tenantID string, fn f
 
 // pgxTx is a minimal interface for pgx transaction operations.
 type pgxTx interface {
-	Exec(ctx context.Context, sql string, args ...any) (interface{}, error)
-	Query(ctx context.Context, sql string, args ...any) (interface{}, error)
-	QueryRow(ctx context.Context, sql string, args ...any) interface{}
+	Exec(ctx context.Context, sql string, args ...any) (pgconn.CommandTag, error)
+	Query(ctx context.Context, sql string, args ...any) (pgx.Rows, error)
+	QueryRow(ctx context.Context, sql string, args ...any) pgx.Row
 }
 
 // Migrate applies all pending SQL migrations from the migrations/ directory.
