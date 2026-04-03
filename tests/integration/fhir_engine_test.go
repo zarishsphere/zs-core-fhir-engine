@@ -15,6 +15,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/docker/go-connections/nat"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -35,6 +36,7 @@ type testSetup struct {
 // setupTest starts PostgreSQL 18.3 + TimescaleDB, runs migrations, and starts the FHIR server.
 func setupTest(t *testing.T) *testSetup {
 	t.Helper()
+	testcontainers.SkipIfProviderIsNotHealthy(t)
 
 	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Minute)
 
@@ -48,8 +50,8 @@ func setupTest(t *testing.T) *testSetup {
 				"POSTGRES_DB":       "zs_fhir_test",
 			},
 			ExposedPorts: []string{"5432/tcp"},
-			WaitingFor: wait.ForSQL("5432/tcp", "postgres", func(host string, port int) string {
-				return fmt.Sprintf("postgresql://zs_test:zs_test@%s:%d/zs_fhir_test?sslmode=disable", host, port)
+			WaitingFor: wait.ForSQL("5432/tcp", "postgres", func(host string, port nat.Port) string {
+				return fmt.Sprintf("postgresql://zs_test:zs_test@%s:%s/zs_fhir_test?sslmode=disable", host, port.Port())
 			}).WithStartupTimeout(60 * time.Second),
 		},
 		Started: true,
